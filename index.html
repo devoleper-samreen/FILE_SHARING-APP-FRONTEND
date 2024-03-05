@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>file sharing app</title>
+    <link rel="stylesheet" type="text/css" href="index.css" />
+  </head>
+  <body>
+    <form method="post" enctype="multipart/form-data">
+      <div>
+        <h1>simple file sharing</h1>
+        <h4>upload and share the download link</h4>
+        <input type="file" id="file-input" />
+        <br />
+        <button onclick="uploadFile()" type="button">Upload</button>
+
+        <a
+          id="direct-download-link"
+          href="#"
+          style="display: none"
+          download
+          target="_blank"
+        ></a>
+      </div>
+    </form>
+
+    <script>
+      const uploadFile = () => {
+        let fileInput = document.getElementById("file-input");
+
+        let file = fileInput.files[0];
+
+        let formData = new FormData();
+        formData.append("file", file);
+
+        let xhr = new XMLHttpRequest();
+
+        xhr.open("POST", "http://localhost:4000/upload", true);
+
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            let response = JSON.parse(xhr.responseText);
+            console.log(response);
+
+            let downloadLink = document.getElementById("direct-download-link");
+            downloadLink.href = response.path;
+            downloadLink.setAttribute("download", response.name);
+            downloadLink.textContent =
+              "Direct Download Link :" + "  " + response.path;
+            downloadLink.style.display = "block";
+            fileInput.value = "";
+          } else {
+            console.error("file upload failed ");
+          }
+        };
+
+        xhr.send(formData);
+      };
+    </script>
+  </body>
+</html>
